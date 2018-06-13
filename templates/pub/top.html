@@ -1,0 +1,88 @@
+{% load static %}
+<div class="header py-4">
+  <div class="container">
+    <div class="d-flex">
+      <a class="header-brand" href="/">
+        <img src="{% static 'image/logo-l.png' %}" class="header-brand-img" alt="Remember logo">
+      </a>
+      <div class="d-flex order-lg-2 ml-auto">
+        <div class="dropdown d-none d-md-flex">
+          <a class="nav-link icon" data-toggle="dropdown">
+            <i class="fe fe-bell"></i>
+            <!-- <span class="nav-unread"></span> -->
+          </a>
+          <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+            {% comment %}<a href="#" class="dropdown-item d-flex">
+              <span class="avatar mr-3 align-self-center" style="background-image: url(demo/faces/male/41.jpg)"></span>
+              <div>
+                <strong>Nathan</strong> pushed new commit: Fix page load performance issue.
+                <div class="small text-muted">10 minutes ago</div>
+              </div>
+            </a>{% endcomment %}
+              <div class="text-center">
+                暂无
+              </div>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item text-center text-muted-dark">全部标记已读</a>
+          </div>
+        </div>
+        <div class="dropdown">
+          <a href="#" class="nav-link pr-0 leading-none" data-toggle="dropdown">
+            <span class="avatar" style="background-image: url({% if user.userheadphoto_set.last.head_portrait %}/media/{{ user.userheadphoto_set.last.head_portrait }}{% else %}/static/image/logo-m.png{% endif %})"></span>
+            <span class="ml-2 d-none d-lg-block">
+              <span class="text-default">{% firstof user.get_short_name user.get_username %}</span>
+            </span>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+            <a class="dropdown-item" href="{% url 'common:myInfo' %}">
+              <i class="dropdown-icon fe fe-user"></i> 个人资料
+            </a>
+            <a class="dropdown-item" href="{% url 'common:editMyPWD' %}">
+              <i class="dropdown-icon fe fe-edit"></i> 修改密码
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">
+              <i class="dropdown-icon fe fe-help-circle"></i> 帮助
+            </a>
+            <a class="dropdown-item" href="{% url 'common:logout' %}">
+              <i class="dropdown-icon fe fe-log-out"></i> 退出
+            </a>
+          </div>
+        </div>
+      </div>
+      <a href="#" class="header-toggler d-lg-none ml-3 ml-lg-0" data-toggle="collapse" data-target="#headerMenuCollapse">
+        <span class="header-toggler-icon"></span>
+      </a>
+    </div>
+  </div>
+</div>
+<div class="header collapse d-lg-flex p-0" id="headerMenuCollapse">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-3 ml-auto">
+        <form class="input-icon my-3 my-lg-0" action="{% url 'common:search' %}" method="get" onsubmit="if($('#search').val()=='')return false;">
+          <input type="search" id="search" name="q" class="form-control header-search" placeholder="搜索&hellip;" tabindex="1" value="{{ search }}">
+          <div class="input-icon-addon">
+            <i class="fe fe-search"></i>
+          </div>
+        </form>
+      </div>
+      <div class="col-lg order-lg-first">
+        <ul class="nav nav-tabs border-0 flex-column flex-lg-row">
+          <li class="nav-item">
+            <a href="{% url 'common:index' %}" id="home" class="nav-link"><i class="fe fe-home"></i> 主页</a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'remember:myFriends' %}" id="friend" class="nav-link"><i class="fa fa-address-book-o"></i> 我的朋友</a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'remember:selectShare' %}" id="share" class="nav-link"><i class="fe fe-share-2"></i> 分享我的地址</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a href="{% url 'remember:quasi' %}" id="quasi" class="nav-link"><i class="fa fa-address-book"></i> 准朋友</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

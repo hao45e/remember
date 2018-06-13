@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>分享 - Remember</title>
+    <link rel="icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static '/assets/css/dashboard.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/plugins/charts-c3/plugin.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/plugins/maps-google/plugin.css' %}" rel="stylesheet" />
+</head>
+<body class="">
+    <div class="page">
+      <div class="page-main">
+        {% include 'pub/top.html' %}
+        <div class="my-3 my-md-5">
+            <div class="container">
+                <div class="page-header">
+                  <h1 class="page-title">
+                    请选择分享类型
+                  </h1>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-lg-6">
+                        <div class="card">
+                          <div class="card-status bg-green"></div>
+                          <a href="{% url 'remember:shareQRcode' %}">
+                          <div class="card-body text-center">
+                            <i class="fa fa-qrcode" style="font-size:200px;"></i>
+                            <div class="display-3 my-4">二维码分享</div>
+                          </div>
+                          </a>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-6">
+                        <div class="card">
+                          <div class="card-status bg-green"></div>
+                          <a href="{% url 'remember:shareChain' %}">
+                          <div class="card-body text-center">
+                            <i class="fa fa-chain" style="font-size:200px;"></i>
+                            <div class="display-3 my-4">链接分享</div>
+                          </div>
+                          </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container text-red text-center">
+                <em>链接仅限当天有效</em>
+            </div>
+        </div>
+      </div>
+      {% include 'pub/footer.html' %}
+    </div>
+<script src="{% static '/assets/js/require.min.js' %}"></script>
+    <script>
+      requirejs.config({
+          baseUrl: '/static'
+      });
+      document.getElementById('share').classList.add('active');
+</script>
+<script src="{% static '/assets/js/dashboard.js' %}"></script>
+<script src="{% static '/assets/plugins/charts-c3/plugin.js' %}"></script>
+<script src="{% static '/assets/plugins/maps-google/plugin.js' %}"></script>
+<script src="{% static '/assets/plugins/input-mask/plugin.js' %}"></script>
+  </body>
+</html>

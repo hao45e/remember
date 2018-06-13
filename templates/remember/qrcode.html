@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>二维码 - 分享 - Remember</title>
+    <link rel="icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static '/assets/css/dashboard.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/plugins/charts-c3/plugin.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/plugins/maps-google/plugin.css' %}" rel="stylesheet" />
+</head>
+<body class="">
+    <div class="page">
+      <div class="page-main">
+        {% include 'pub/top.html' %}
+        <div class="my-3 my-md-5 text-center">
+          <img src="/{{ msg }}">
+          <div class="container text-red text-center">
+            <em>二维码仅限当天有效</em>
+          </div>
+        </div>
+      </div>
+      {% include 'pub/footer.html' %}
+    </div>
+<script src="{% static '/assets/js/require.js' %}"></script>
+    <script>
+      requirejs.config({
+          baseUrl: '/static'
+      });
+      document.getElementById('share').classList.add('active');
+      require(['jquery', 'clipboard'], function($, ClipboardJS){
+       // new ClipboardJS('#copy');
+        var clipboard = new ClipboardJS('#copy');
+        clipboard.on('success', function(e) {
+            alert('已将链接复制到你的粘贴板啦.\n快分享给你的朋友吧.\n仅限当天有效哦.');
+            console.info('copy success \nText:', e.text);
+            e.clearSelection();
+        });
+        clipboard.on('error', function(e) {
+            alert('复制失败, 请手动复制.sorry')
+            console.error('copy:', 'error');
+            console.error('Action:', e.action);
+            console.error('Trigger:', e.trigger);
+        });
+      });
+</script>
+
+<script src="{% static '/assets/js/dashboard.js' %}"></script>
+<script src="{% static '/assets/plugins/charts-c3/plugin.js' %}"></script>
+<script src="{% static '/assets/plugins/maps-google/plugin.js' %}"></script>
+<script src="{% static '/assets/plugins/input-mask/plugin.js' %}"></script>
+  </body>
+</html>

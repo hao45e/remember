@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>我的朋友 - Remember</title>
+    <link rel="icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static '/assets/css/dashboard.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/plugins/charts-c3/plugin.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/plugins/maps-google/plugin.css' %}" rel="stylesheet" />
+</head>
+<body class="">
+    <div class="page">
+      <div class="page-main">
+        {% include 'pub/top.html' %}
+        <div class="my-3 my-md-5">
+          <div class="container">
+            <div class="page-header">
+              <h1 class="page-title">
+                我的朋友
+              </h1>
+              <div class="page-subtitle">共 {{ friends_count }} 个</div>
+            </div>
+            <div class="row row-cards">
+              <div class="col-lg-4">
+                <form class="card">
+                  <div class="card-body">
+                    <div class="form-group">
+                      <div class="form-label">姓名</div>
+                      <input id="search-name" name="name" type="text" class="form-control" value="{% if name %}{{ name }}{% endif %}"/>
+                    </div>
+                    <div class="form-group">
+                      <div class="form-label">性别</div>
+                      <div class="selectgroup w-100">
+                        <label class="selectgroup-item">
+                          <input type="radio" name="sex" value="3" class="selectgroup-input" {% if sex == '3' or sex is None or sex == '' %} checked{% endif %}>
+                          <span class="selectgroup-button">全部</span>
+                        </label>
+                        <label class="selectgroup-item">
+                          <input type="radio" name="sex" value="1" class="selectgroup-input" {% if sex == '1' %} checked{% endif %}>
+                          <span class="selectgroup-button">女</span>
+                        </label>
+                        <label class="selectgroup-item">
+                          <input type="radio" name="sex" value="2" class="selectgroup-input" {% if sex == '2' %} checked{% endif %}>
+                          <span class="selectgroup-button">男</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-footer text-right">
+                    <div id="search" class="btn btn-outline-info">搜索</div>
+                  </div>
+                </form>
+              </div>
+              <div class="col-lg-8">
+                <div class="card">
+                  <table class="table card-table table-vcenter text-center">
+                    <tr>
+                      <th class="w-1"></th>
+                      <th>姓名</th>
+                      <th class="d-none d-sm-table-cell">生日</th>
+                      <th class="d-none d-md-table-cell">操作</th>
+                    </tr>
+                      {% if friends_list %}
+                      {% for friend in friends_list %}
+                    <tr>
+                      <td>
+                          <div class="avatar d-block rounded" style="background-image: url({% if friend.friendphoto_set.all.0.photo_img %}/media/{{ friend.friendphoto_set.all.0.photo_img }}{% else %}/static/image/logo-m.png{% endif %})">
+                              {% if friend.sex == 1 %}
+                                  <span class="avatar-status bg-pink"></span>
+                              {% elif friend.sex == 2 %}
+                                  <span class="avatar-status bg-blue"></span>
+                              {% endif %}
+                          </div>
+                      </td>
+                      <td>{{ friend.name }}</td>
+                      <td class="d-none d-sm-table-cell">
+                          {% if friend.birthday %}
+                            {{ friend.birthday|date:"Y-m-d" }}
+                          {% else %}
+                            未填
+                          {% endif %}
+                      </td>
+                      <td class="d-none d-md-table-cell">
+                          <a class="btn btn-outline-dark" href="{% url 'remember:friendInfo' friend.id %}">详情</a>
+                      </td>
+                    </tr>
+                      {% endfor %}
+                      {% else %}
+                    <tr>
+                      <td colspan="4">暂无好友</td>
+                    </tr>
+                      {% endif %}
+                  </table>
+                </div>
+                <ul class="pagination ">
+                  <li class="page-item page-prev {% if friends_list.number == 1 %} disabled {% endif %}">
+                      <a class="page-link" href="javascript:page(1);">
+                          首页
+                      </a>
+                  </li>
+                  {% if friends_list.has_previous %}
+                  <li class="page-item page-prev">
+                      <a class="page-link" href="javascript:page({{ friends_list.previous_page_number }});">
+                          上一页
+                      </a>
+                  </li>
+                  {% else %}
+                  <li class="page-item page-prev disabled">
+                      <a class="page-link" href="javascript:void(0);">
+                          上一页
+                      </a>
+                  </li>
+                  {% endif %}
+                  <li class="page-item">
+                      <a class="page-link">
+                          第 {{ friends_list.number }} 页
+                      </a>
+                  </li>
+                  <li class="page-item">
+                      <a class="page-link">
+                          共 {{ friends_list.paginator.num_pages }} 页
+                      </a>
+                  </li>
+                {% if friends_list.has_next %}
+                  <li class="page-item page-next">
+                      <a class="page-link" href="javascript:page({{ friends_list.next_page_number }});">
+                          下一页
+                      </a>
+                  </li>
+                {% else %}
+                  <li class="page-item page-next disabled">
+                      <a class="page-link" href="javascript:void(0);">
+                          下一页
+                      </a>
+                  </li>
+                {% endif %}
+                  <li class="page-item page-next {% if friends_list.number == friends_list.paginator.num_pages %} disabled {% endif %}">
+                      <a class="page-link" href="javascript:page({{ friends_list.paginator.num_pages }});">
+                          尾页
+                      </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% include 'pub/footer.html' %}
+    </div>
+<script src="{% static '/assets/js/require.min.js' %}"></script>
+    <script>
+      requirejs.config({
+          baseUrl: '/static'
+      });
+      document.getElementById('friend').classList.add('active');
+      requirejs(['jquery'], function($){
+          $(document).on('click', '#search', function(){
+              var name = $('#search-name').val();
+              var sex = $('input[name="sex"]:checked').val();
+              window.location.href = '{% url "remember:myFriends" %}?name=' + name + '&sex=' + sex;
+          });
+      });
+      var name = {% if name %}'{{ name }}'{% else %}''{% endif %};
+      var sex = {% if sex %}'{{ sex }}'{% else %}''{% endif %}
+      function page(p){
+          window.location.href = '{% url "remember:myFriends" %}?name=' + name + '&sex=' + sex + '&page=' + p;
+      }
+</script>
+<script src="{% static '/assets/js/dashboard.js' %}"></script>
+<script src="{% static '/assets/plugins/charts-c3/plugin.js' %}"></script>
+<script src="{% static '/assets/plugins/maps-google/plugin.js' %}"></script>
+<script src="{% static '/assets/plugins/input-mask/plugin.js' %}"></script>
+  </body>
+</html>

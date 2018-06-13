@@ -1,0 +1,206 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>准朋友 - Remember</title>
+    <link rel="icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static '/assets/css/dashboard.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/plugins/charts-c3/plugin.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/plugins/maps-google/plugin.css' %}" rel="stylesheet" />
+</head>
+<body class="">
+    <div class="page">
+      <div class="page-main">
+        {% include 'pub/top.html' %}
+        <div class="my-3 my-md-5">
+            <div class="row-cards row-deck">
+              <div class="col-11 m-auto">
+                <div class="card">
+                  <div class="table-responsive">
+                    <table class="table table-hover table-outline table-vcenter text-nowrap card-table">
+                        <thead>
+                            <tr>
+                                <th class="w-1">选择</th>
+                                <th class="w-10"><i class="icon-people"></i></th>
+                                <th>陌生人</th>
+                                <th class="text-center">手机号</th>
+                                <th class="text-center">故乡</th>
+                                <th class="text-center">现居地</th>
+                                <th class="text-center">时间</th>
+                                <th>相识</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% if friends_list %}
+                        {% for friend in friends_list %}
+                            <tr>
+                              <td>
+                                  <div class="w-1">
+                                      <label class="custom-control custom-checkbox custom-control-inline">
+                                        <input type="checkbox" class="custom-control-input"
+                                               name="checkbox" value="{{ friend.id }}">
+                                        <div class="custom-control-label"></div>
+                                      </label>
+                                  </div>
+                              </td>
+                              <td class="text-center">
+                              {% if friend.friendphoto_set.all %}
+                                  {% for img in friend.friendphoto_set.all %}
+                                      <div class="avatar d-block" title="{{ img.photo_description }}"
+                                           style="background-image: url('/media/{{ img.photo_img }}'); float:left;"></div>
+                                  {% endfor %}
+                              {% else %}
+                                  未上传
+                              {% endif %}
+                              </td>
+                              <td>
+                                  <div>{{ friend.name }}</div>
+                                  <div class="small text-muted">
+                                      {% if friend.sex == 1 %}
+                                          女
+                                      {% elif friend.sex == 2 %}
+                                          男
+                                      {% else %}
+                                          未知
+                                      {% endif %}
+                                      {% if friend.age %}
+                                          {{ friend.age }}岁
+                                      {% endif %}
+                                  </div>
+                              </td>
+                              <td class="text-center">
+                                  {% if friend.phone %}
+                                      {{ friend.phone }}
+                                  {% else %}
+                                      未填
+                                  {% endif %}
+                              </td>
+                              <td class="text-center">
+                                  {% if friend.old_address %}
+                                      {{ friend.old_address }}
+                                  {% else %}
+                                      未填
+                                  {% endif %}
+                              </td>
+                              <td class="text-center">
+                                  {% if friend.new_address %}
+                                      {{ friend.new_address }}
+                                  {% else %}
+                                      未填
+                                  {% endif %}
+                              </td>
+                              <td class="text-center">
+                                  {{ friend.create_time|date:"Y-m-d H:i:s" }}
+                              </td>
+                              <td>
+                                  {% if friend.origin %}
+                                      {{ friend.origin }}
+                                  {% else %}
+                                      未填
+                                  {% endif %}
+                              </td>
+                            </tr>
+                        {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center">暂无数据</td>
+                            </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="">
+                    {% csrf_token %}
+                    <button id="through" class="btn btn-outline-primary w-25">通过</button>
+                    <button id="refused" class="btn btn-outline-danger w-25">拒绝(删除)</button>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+      {% include 'pub/footer.html' %}
+    </div>
+<script src="{% static '/assets/js/require.min.js' %}"></script>
+    <script>
+      requirejs.config({
+          baseUrl: '/static'
+      });
+      document.getElementById('quasi').classList.add('active');
+      requirejs(['jquery'], function($){
+         $(document).on('click', '#through', function(){
+             checkfun(1);
+         });
+         $(document).on('click', '#refused', function(){
+             checkfun(2);
+         });
+      });
+      var csrftoken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+
+       function csrfSafeMethod(method) {
+           // these HTTP methods do not require CSRF protection
+           return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+       }
+      function checkfun(i){
+          var chk_value =[];
+          var type = i;
+          var data = {};
+          $('input[name="checkbox"]:checked').each(function(){
+              chk_value.push($(this).val());
+          });
+          if(chk_value.length == 0){
+              alert('你还没有选择任何内容！');
+              return;
+          }
+          if(type !== 1 && type !== 2){
+              alert('error');
+              return;
+          }
+          data = {
+              'type': type,
+              'value': chk_value,
+          };
+          $.ajax({
+              url: "{% url 'remember:quasiOperating' %}",
+              method: 'POST',
+              beforeSend:function(jqXHR, settings){
+                  $('#loader-main').addClass('active');
+                  if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                      jqXHR.setRequestHeader("X-CSRFToken", csrftoken);
+                  }
+              },
+              data: JSON.stringify(data),
+              success: function(data, textStatus, jqXHR){
+                  if(data.code == 112){
+                      //alert('through success 同意成功');
+                  }else if(data.code == 113){
+                      //alert('refused success 拒绝成功');
+                  }else if(data.code == 114){
+                      alert('操作失败');
+                  }else{
+                      alert('出现异常, 请联系管理员');
+                  }
+              },
+              timeout: 3000,
+              error: function(jqXHR, textStatus, errorThrown){
+                  if(textStatus === 'timeout'){
+                      alert('请求超时');
+                  }else{
+                      alert('出现错误, 请刷新页面');
+                  }
+              },
+              complete: function(jqXHR, textStatus){
+                  location.reload();
+              }
+          });
+      }
+</script>
+<script src="{% static '/assets/js/dashboard.js' %}"></script>
+<script src="{% static '/assets/plugins/charts-c3/plugin.js' %}"></script>
+<script src="{% static '/assets/plugins/maps-google/plugin.js' %}"></script>
+<script src="{% static '/assets/plugins/input-mask/plugin.js' %}"></script>
+  </body>
+</html>

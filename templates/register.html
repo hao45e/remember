@@ -1,0 +1,231 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>注册 - Remember</title>
+    <link rel="icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link href="{% static '/assets/css/dashboard.css' %}" rel="stylesheet" />
+</head>
+<body class="">
+    <div class="page">
+      <div class="page-single">
+        <div class="container">
+          <div class="row">
+            <div class="col col-login mx-auto">
+              <form id="register" class="card" method="post">
+                {% csrf_token %}
+                <div class="card-body p-6">
+                  <div class="card-title">创建新账号</div>
+                  <div id="loader-main" class="dimmer">
+                    <div class="loader"></div>
+                    <div class="dimmer-content">
+                      <div id="error-message" class="card-alert alert alert-danger mb-0" style="display: none;"></div>
+                      <div class="form-group">
+                        <label class="form-label">{{ form.username.label_tag }}</label>
+                        <input type="text" class="form-control" id="username" name="username"
+                               placeholder="请输入账号" minlength="6" maxlength="20" required>
+                        <div class="valid-feedback">{{ form.username.help_text }}</div>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">{{ form.password1.label_tag }}</label>
+                        <input type="password" class="form-control" id="password1" name="password1"
+                               placeholder="请输入密码" minlength="8" maxlength="16" required>
+                        <div class="valid-feedback">{{ form.password1.help_text }}</div>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">{{ form.password2.label_tag }}</label>
+                        <input type="password" class="form-control" id="password2" name="password2"
+                               placeholder="再次确认密码" minlength="8" maxlength="16" required>
+                        <div class="valid-feedback">{{ form.password2.help_text }}</div>
+                        <div class="invalid-feedback">两次密码不一致</div>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">{{ form.invite.label_tag }}</label>
+                        <div class="row gutters-sm">
+                          <div class="col">
+                          <input type="text" class="form-control" name="invite" id="invite"
+                                 placeholder="请输入邀请码" required>
+                        </div>
+                        <span class="col-auto align-self-center">
+                        <span class="form-help" data-toggle="popover" data-placement="top"
+                              data-content="<p>如果您还没有邀请码<br>您可以通过QQ联系网站管理员<br><strong style='color:green;'>完全免费</strong></p>
+                              <p class='mb-0'><a title='1220202232' data-toggle='tooltip' href='tencent://message/?uin=1220202232'>Click on my QQ</a></p>
+                              <br><p>或者输入, 年+月+日+小时=邀请码<br>(例如: 2018+6+11+16=2051)</p>">?</span>
+                        </span>
+                        </div>
+                        <div class="form-group">
+                          <label class="custom-switch">
+                            <input type="checkbox" name="terms" id="terms" class="custom-switch-input">
+                            <span class="custom-switch-indicator"></span>
+                            <span class="custom-switch-description">同意<a href="terms.html">服务条款</a></span>
+                          </label>
+                          <div class="invalid-feedback">请同意服务条款</div>
+                        </div>
+                        <div class="form-footer">
+                          <button type="submit" class="btn btn-primary btn-block">创建账号</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+              <div class="text-center text-muted">
+                已有账号? <a href="{% url 'common:login' %}">登陆</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="{% static '/assets/js/require.min.js' %}"></script>
+    <script>
+         requirejs.config({
+             baseUrl: '/static'
+         });
+    </script>
+    <script src="{% static '/assets/js/dashboard.js' %}"></script>
+    <script src="{% static '/assets/plugins/input-mask/plugin.js' %}"></script>
+    <script>
+        function register_verification(id){
+            var val = $('#'+id).val();
+            switch (id){
+                case 'username':
+                    var s = /^\w*$/;
+                    var b = 6 <= val.length && val.length <= 20;
+                    if((s.test(val) && b) || (val == '')){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                case 'password1':
+                    if((8 <= val.length && val.length <= 16) || (val == '')){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                case 'password2':
+                    if(val == $('#password1').val()){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                default:
+                    alert('default');
+            }
+        }
+        require(['jquery'], function($){
+           $(document).ready(function() {
+
+               $('#username, #password1, #password2').focus(function(){
+                   $(this).removeClass('is-invalid');
+                   $(this).next().removeClass('invalid-feedback');
+                   $(this).next().addClass('valid-feedback');
+                   $(this).addClass('is-valid');
+               });
+               $('#username, #password1, #password2').blur(function(){
+                   $(this).removeClass('is-valid');
+                   var sd = register_verification(this.id);
+                   console.log(sd);
+                   if(sd){
+
+                   }else{
+                       $(this).addClass('is-invalid');
+                       $(this).next().removeClass('valid-feedback');
+                       $(this).next().addClass('invalid-feedback');
+                   }
+               });
+
+               var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+               function csrfSafeMethod(method) {
+                   // these HTTP methods do not require CSRF protection
+                   return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+               }
+
+               $(document).on('submit', '#register', function(e){
+                    e.preventDefault();
+                    $('#error-message').css('display', 'none');
+                    var terms = $("#terms").is(':checked');
+                    if(!terms){
+                        alert('请同意服务条款');
+                        return;
+                    }
+                    var username = $('#username').val();
+                    var password1 = $("#password1").val();
+                    var password2 = $("#password2").val();
+                    if(password1 != password2){
+                        $('#password2').addClass('is-invalid');
+                        return;
+                    }
+                    var invite = $("#invite").val();
+                    $.ajax({
+                        url: "{% url 'common:register' %}",
+                        method: 'POST',
+                        beforeSend:function(jqXHR, settings){
+                            $('#loader-main').addClass('active');
+                            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                                jqXHR.setRequestHeader("X-CSRFToken", csrftoken);
+                            }
+                        },
+                        data: {
+                            'username': username,
+                            'password1': password1,
+                            'password2': password2,
+                            'invite': invite,
+                            'terms': terms,
+                        },
+                        success: function(data, textStatus, jqXHR){
+
+                            if(data.code == 106){
+                                $('#error-message').html('该账号已被注册');
+                                $('#error-message').css('display', 'block');
+                            }else if(data.code == 105){
+                                alert('注册成功\n账号:' + username + '\n密码:' + password1);
+                                window.location.href = '/login/';
+                            }else if(data.code == 104){
+                                var error_msg = '';
+                                if(data.username != undefined){
+                                    error_msg += data.username[0].message + '<br>';
+                                }
+                                if(data.password2 != undefined){
+                                    error_msg += data.password2[0].message + '<br>';
+                                }
+                                if(data.invite != undefined){
+                                    error_msg += data.invite[0].message + '<br>';
+                                }
+                                if(data.terms != undefined){
+                                    error_msg += data.terms[0].message + '<br>';
+                                }
+                                if(error_msg != ''){
+                                    $('#error-message').html(error_msg);
+                                    $('#error-message').css('display', 'block');
+                                }
+
+                            }else if(data.code == 107){
+                                alert('增加用户出现异常，请联系管理员');
+                            }else if(data.code == 999){
+                                alert('系统出现未知错误，请联系管理员');
+                            }else{
+                                alert('系统出现不可预错误，请联系管理员');
+                            }
+                        },
+                        timeout: 3000,
+                        error: function(jqXHR, textStatus, errorThrown){
+                            if(textStatus === 'timeout'){
+                                alert('请求超时');
+                            }else{
+                                alert('出现错误');
+                            }
+                        },
+                        complete: function(jqXHR, textStatus){
+                            $('#loader-main').removeClass('active');
+                        }
+                    });
+                });
+           });
+        });
+    </script>
+  </body>
+</html>

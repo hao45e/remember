@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>个人资料 - Remember</title>
+    <link rel="icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static '/assets/css/dashboard.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/plugins/charts-c3/plugin.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/plugins/maps-google/plugin.css' %}" rel="stylesheet" />
+</head>
+<body class="">
+    <div class="page">
+      <div class="page-main">
+        {% include 'pub/top.html' %}
+        <div class="my-3 my-md-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4"></div>
+                    <div class="col-lg-4 col-md-12">
+                        <div class="card card-profile">
+                            <div class="card-img-top text-center p-5">
+                                <span class="avatar avatar-xxl" style="background-image: url({% if user.userheadphoto_set.last.head_portrait %}/media/{{ user.userheadphoto_set.last.head_portrait }}{% else %}/static/image/logo-m.png{% endif %})"></span>
+                            </div>
+                            <div class="card-body text-center">
+                                <h3 class="mb-3">{{ user.first_name }}</h3>
+                                <p class="mb-4">{{ user.username }}</p>
+                                <a href="{% url 'common:editMyInfo' %}"><button class="btn btn-outline-info">编辑资料</button></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4"></div>
+                </div>
+            </div>
+        </div>
+      </div>
+      {% include 'pub/footer.html' %}
+    </div>
+<script src="{% static '/assets/js/require.js' %}"></script>
+<script>
+      requirejs.config({
+          baseUrl: '/static'
+      });
+      //document.getElementById('home').classList.add('active');
+</script>
+<script src="{% static '/assets/js/dashboard.js' %}"></script>
+<script src="{% static '/assets/plugins/charts-c3/plugin.js' %}"></script>
+<script src="{% static '/assets/plugins/maps-google/plugin.js' %}"></script>
+<script src="{% static '/assets/plugins/input-mask/plugin.js' %}"></script>
+  </body>
+</html>

@@ -1,0 +1,202 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ friend.name }} 资料 - Remember</title>
+    <link rel="icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static '/assets/css/dashboard.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/plugins/charts-c3/plugin.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/plugins/maps-google/plugin.css' %}" rel="stylesheet" />
+    <style type="text/css">
+        .over {position: fixed; left:0; top:0; width:100%; z-index:100;}
+        .tempContainer {position:fixed; width:100%; margin-right:0px; margin-left:0px; text-align:center; z-index:101;}
+    </style>
+</head>
+<body class="">
+    <div class="page">
+      <div class="page-main">
+        {% include 'pub/top.html' %}
+        <div class="my-3 my-md-5">
+            <div class="over"></div>
+            <div class="container">
+                <div class="">
+                    <a href="javascript:history.back()"><div class="btn btn-outline-dark">返回</div></a>
+                </div>
+                <div class="row">
+                    <div class="col-3"></div>
+                    <div class="col-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3 class="card-title text-center">朋友资料</h3>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label class="form-label text-center">姓名</label>
+                                            <input type="text" class="form-control text-center" disabled=""
+                                                   placeholder="未填" value="{{ friend.name }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label class="form-label text-center">手机号</label>
+                                            <input type="text" class="form-control text-center" disabled=""
+                                                   placeholder="未填" value="{{ friend.phone }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label class="form-label text-center">性别</label>
+                                            <input type="text" class="form-control text-center" disabled=""
+                                                   placeholder="未填" value="{% if friend.sex == 1 %}女{% elif friend.sex == 2 %}男{% endif %}">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label class="form-label text-center">生日</label>
+                                            <input type="text" class="form-control text-center" disabled=""
+                                                   placeholder="未填" value="{% if friend.birthday %}{{ friend.birthday|date:"Y-m-d" }}{% endif %}">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label class="form-label text-center">现居地</label>
+                                            <input type="text" class="form-control text-center" disabled=""
+                                                   placeholder="未填" value="{{ friend.new_address }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label class="form-label text-center">故乡</label>
+                                            <input type="text" class="form-control text-center" disabled=""
+                                                   placeholder="未填" value="{{ friend.old_address }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label class="form-label text-center">相识</label>
+                                            <textarea rows="3" class="form-control" placeholder="未填" disabled="">{{ friend.origin }}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3"></div>
+                </div>
+                <div class="row">
+                    {% for img in friend.friendphoto_set.all %}
+                    <div class="col-lg-3 col-md-6 col-sm-6">
+                        <div class="card p-3">
+                            <a class="mb-3 amplifyImg">
+                                <img src="/media/{{ img.photo_img }}" alt="{{ img.photo_description }}" class="rounded">
+                            </a>
+                            <div class="d-flex align-items-center px-2">
+                                <div class="text-center">{{ img.photo_description }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="row">
+                    <div class="col-9"></div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label class="form-label text-center">加入时间</label>
+                            <input type="text" class="form-control text-center" disabled=""
+                                   placeholder="未填" value="{{ friend.create_time|date:'Y-m-d H:i:s' }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      {% include 'pub/footer.html' %}
+    </div>
+<script src="{% static '/assets/js/require.min.js' %}"></script>
+    <script>
+      requirejs.config({
+          baseUrl: '/static'
+      });
+      document.getElementById('friend').classList.add('active');
+      requirejs(['jquery'], function($){
+          var imgsObj = $('.amplifyImg img');//需要放大的图像
+          if(imgsObj){
+              $.each(imgsObj,function(){
+                  $(this).click(function(){
+                      var currImg = $(this);
+                      coverLayer(1);
+                      var tempContainer = $('<div class=tempContainer></div>');//图片容器
+                      with(tempContainer){//width方法等同于$(this)
+                          appendTo("body");
+                          var windowWidth=$(window).width();
+                          var windowHeight=$(window).height();
+                          //获取图片原始宽度、高度
+                          var orignImg = new Image();
+                          orignImg.src =currImg.attr("src") ;
+                          var currImgWidth= orignImg.width;
+                          var currImgHeight = orignImg.height;
+                          if(currImgWidth<windowWidth){//为了让图片不失真，当图片宽度较小的时候，保留原图
+                              if(currImgHeight<windowHeight){
+                                  var topHeight=(windowHeight-currImgHeight)/2;
+                                  if(topHeight>35){/*此处为了使图片高度上居中显示在整个手机屏幕中：因为在android,ios的微信中会有一个title导航，35为title导航的高度*/
+                                      topHeight=topHeight-35;
+                                      css('top',topHeight);
+                                  }else{
+                                      css('top',0);
+                                  }
+                                  html('<img border=0 src=' + currImg.attr('src') + '>');
+                              }else{
+                                  css('top',0);
+                                  html('<img border=0 src=' + currImg.attr('src') + ' height='+windowHeight+'>');
+                              }
+                          }else{
+                              var currImgChangeHeight=(currImgHeight*windowWidth)/currImgWidth;
+                              if(currImgChangeHeight<windowHeight){
+                                  var topHeight=(windowHeight-currImgChangeHeight)/2;
+                                  if(topHeight>35){
+                                      topHeight=topHeight-35;
+                                      css('top',topHeight);
+                                  }else{
+                                      css('top',0);
+                                  }
+                                  html('<img border=0 src=' + currImg.attr('src') + ' width='+windowWidth+';>');
+                              }else{
+                                  css('top',0);
+                                  html('<img border=0 src=' + currImg.attr('src') + ' width='+windowWidth+'; height='+windowHeight+'>');
+                              }
+                          }
+                      }
+                      tempContainer.click(function(){
+                          $(this).remove();
+                          coverLayer(0);
+                      });
+                  });
+              });
+          }
+          else{
+              return false;
+          }
+          //使用禁用蒙层效果
+          function coverLayer(tag){
+              with($('.over')){
+                  if(tag==1){
+                      css('height',$(document).height());
+                      css('display','block');
+                      css('opacity',1);
+                      css("background-color","#191919");
+                  }else{
+                      css('display','none');
+                  }
+              }
+          }
+      });
+</script>
+<script src="{% static '/assets/js/dashboard.js' %}"></script>
+<script src="{% static '/assets/plugins/charts-c3/plugin.js' %}"></script>
+<script src="{% static '/assets/plugins/maps-google/plugin.js' %}"></script>
+<script src="{% static '/assets/plugins/input-mask/plugin.js' %}"></script>
+  </body>
+</html>

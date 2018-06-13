@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑资料 - Remember</title>
+    <link rel="icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static '/assets/css/dashboard.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/plugins/charts-c3/plugin.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/plugins/maps-google/plugin.css' %}" rel="stylesheet" />
+</head>
+<body class="">
+    <div class="page">
+      <div class="page-main">
+        {% include 'pub/top.html' %}
+        <div class="my-3 my-md-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4"></div>
+                    <div class="col-lg-4 col-md-12">
+                        <div class="card card-profile">
+                            <form id="main-form" method="POST" enctype="multipart/form-data">
+                                <div class="card-img-top text-center p-5">
+                                    <div class="preview">
+                                        <span class="avatar avatar-xxl" style="background-image: url({% if user.userheadphoto_set.last.head_portrait %}/media/{{ user.userheadphoto_set.last.head_portrait }}{% else %}/static/image/logo-m.png{% endif %})"></span>
+                                    </div>
+                                    <div class="custom-file" style="margin-top: 5px;">
+                                        <input class="custom-file-input" type="file" name="head_photo" onchange="editHeadPhoto(this);" accept="image/jpeg">
+                                        <label class="custom-file-label">选择图片</label>
+                                    </div>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="form-group">
+                                        <label class="form-label">姓名</label>
+                                        <input class="form-control text-center" name="name" type="text" value="{{ user.first_name }}">
+                                    </div>
+                                    {% csrf_token %}
+                                    <div id="myInfoEdit" class="btn btn-outline-info">保存</div>
+                                    <a href="{% url 'common:myInfo' %}"><div class="btn btn-outline-info">取消</div></a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-lg-4"></div>
+                </div>
+            </div>
+        </div>
+      </div>
+      {% include 'pub/footer.html' %}
+    </div>
+<script src="{% static '/assets/js/require.js' %}"></script>
+<script>
+      requirejs.config({
+          baseUrl: '/static'
+      });
+      //document.getElementById('home').classList.add('active');
+</script>
+<script src="{% static '/assets/js/dashboard.js' %}"></script>
+<script src="{% static '/assets/plugins/charts-c3/plugin.js' %}"></script>
+<script src="{% static '/assets/plugins/maps-google/plugin.js' %}"></script>
+<script src="{% static '/assets/plugins/input-mask/plugin.js' %}"></script>
+<script>
+    function editHeadPhoto(file){
+        var prevDiv = $(file).parent().parent().find('.preview');
+        if(file.files.length == 0) {
+            prevDiv.html('<span class="avatar avatar-xxl" style="background-image: url(/media/{{ user.userheadphoto_set.last.head_portrait }})"></span>');
+        }else if (file.files && file.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(evt) {
+                prevDiv.html('<span class="avatar avatar-xxl" style="background-image: url(' + evt.target.result + ')"></span>')
+            }
+            reader.readAsDataURL(file.files[0]);
+        } else {//IE
+            prevDiv.html('<span class="avatar avatar-xxl" style="background-image: url(' + file.value + ')"></span>')
+        }
+    }
+    requirejs(['jquery'], function($){
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $(document).on('click', '#myInfoEdit', function(){
+            var form = new FormData(document.getElementById('main-form'));
+            $.ajax({
+                url: '{% url "common:editMyInfo" %}',
+                type: 'POST',
+                beforeSend:function(jqXHR, settings){
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        jqXHR.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                },
+                data: form,
+                processData:false,
+                contentType:false,
+                success: function(data){
+                    if(data.code == 115){
+                        window.location.href = '{% url "common:myInfo" %}';
+                    }else if(data.code == 116){
+                        alert('修改失败, 请刷新页面, 如多次出现请联系管理员. ');
+                    }
+                }
+            });
+        });
+    });
+</script>
+  </body>
+</html>

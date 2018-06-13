@@ -1,0 +1,146 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>主页 - Remember</title>
+    <link rel="icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static '/assets/css/dashboard.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/plugins/charts-c3/plugin.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/plugins/maps-google/plugin.css' %}" rel="stylesheet" />
+</head>
+<body class="">
+    <div class="page">
+      <div class="page-main">
+        {% include 'pub/top.html' %}
+        <div class="my-3 my-md-5">
+            <div class="container">
+                <div class="row">
+                    {% if female_count or male_count %}
+                    <div class="col-lg-4 col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">男女比例</h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="chart-donut" style="height: 16rem"></div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="col-lg-8 col-md-12">
+                    <div class="card">
+                      <div class="card-header">
+                        <h3 class="card-title">全国分布图</h3>
+                      </div>
+                      <div class="card-body">
+                        <div class="map">
+                          <div class="map-content" id="map-world-svg"></div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      {% include 'pub/footer.html' %}
+      </div>
+    </div>
+<script src="{% static '/assets/js/require.js' %}"></script>
+<script>
+      requirejs.config({
+          baseUrl: '/static'
+      });
+      document.getElementById('home').classList.add('active');
+</script>
+<script src="{% static '/assets/js/dashboard.js' %}"></script>
+<script src="{% static '/assets/plugins/charts-c3/plugin.js' %}"></script>
+<script src="{% static '/assets/plugins/maps-google/plugin.js' %}"></script>
+<script src="{% static '/assets/plugins/input-mask/plugin.js' %}"></script>
+<script>
+    require(['c3', 'jquery'], function(c3, $) {
+        $(document).ready(function(){
+            var chart = c3.generate({
+                bindto: '#chart-donut', // id of chart wrapper
+                    data: {
+                        columns: [
+                            /// each columns data
+                            ['data1', {% if female_count %}{{ female_count }}{% else %}0{% endif %}],
+                            ['data2', {% if male_count %}{{ male_count }}{% else %}0{% endif %}]
+                        ],
+                        type: 'donut', // default type of chart
+                        colors: {
+                            'data1': tabler.colors["pink"],
+                            'data2': tabler.colors["blue"]
+                        },
+                        names: {
+                            // name of each serie
+                            'data1': '女 :',
+                            'data2': '男 :'
+                        }
+                    },
+                axis: {
+
+                },
+                legend: {
+                    show: false, //hide legend
+                },
+                padding: {
+                    bottom: 0,
+                    top: 0
+                },
+            });
+        });
+    });
+</script>
+<script>
+  require(['jquery', 'vector-map', 'vector-map-china'], function(){
+      $(document).ready(function(){
+
+          var data = {
+          {% for key, value in friends_map.items %}
+              '{{ key }}': {{ value }},
+          {% endfor %}
+          };
+
+          var markers = false;
+
+
+          $('#map-world-svg').vectorMap({
+              map: 'cn_mill',
+              zoomButtons : false,
+              zoomOnScroll: false,
+              panOnDrag: false,
+              backgroundColor: 'transparent',
+              markers: markers,
+              markerStyle: {
+                  initial: {
+                      fill: tabler.colors.blue,
+                      stroke: '#fff',
+                      "stroke-width": 1,
+                      r: 5
+                  },
+              },
+              onRegionTipShow: function(e, el, code, f){
+                  el.html(el.html() + (data[code] ? ': <small>' + data[code]+'</small>' : ''));
+              },
+              series: {
+                  regions: [{
+                      values: data,
+                      scale: ['#EFF3F6', tabler.colors.blue],
+                      normalizeFunction: 'polynomial'
+                  }]
+              },
+              regionStyle: {
+                  initial: {
+                      fill: '#CCCCCC'
+                  }
+              }
+          });
+      });
+  });
+</script>
+  </body>
+</html>

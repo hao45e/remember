@@ -1,0 +1,530 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ first_name }} 的分享 - Remember</title>
+    <link rel="icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link href="{% static '/css/font-awesome.min.css' %}" rel="stylesheet" />
+    <link href="{% static '/assets/css/dashboard.css' %}" rel="stylesheet" />
+    <style type="text/css">
+.icon {
+	width: 2em;
+	height: 2em;
+	vertical-align: -0.15em;
+	fill: currentColor;
+	overflow: hidden;
+}
+.item {
+	float: left;
+	position: relative;
+	margin: 20px;
+}
+.addImg {
+	width: 190px;
+	height: 190px;
+}
+.upload_input {
+	display: none;
+}
+.preview {
+	position: absolute;
+	width: 190px;
+	height: 190px;
+	left: 0;
+	top: 0;
+}
+.click {
+	position: absolute;
+	width: 190px;
+	height: 190px;
+	left: 0;
+	top: 0;
+	z-index: 1;
+	cursor: pointer;
+}
+.delete {
+	position: absolute;
+	right: -2rem;
+	top: -1rem;
+	cursor: pointer;
+	display: none;
+}
+.preview img {
+	width: 100%;
+	height: 100%;
+}
+    </style>
+</head>
+<body class="">
+<div id="page-1" class="page">
+    <div class="page-single">
+        <div class="container">
+            <div class="row">
+                <div class="col text-center mx-auto h1">
+                    是否愿意加入 "<strong class="text-red">{{ first_name }}</strong>" 的Remember
+                    <span class="col-auto align-self-center">
+                      <span class="form-help" data-toggle="popover" data-placement="top"
+                            data-content='<p>加入 "{{ first_name }}" 的朋友备忘录, 让Ta不会忘记你这个好友.</p>'>
+                          ?
+                      </span>
+                  </span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col text-center mx-auto">
+                    <div id="next" class="btn btn-azure w-25 ">Yes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="page-2" class="page" style="display: none;">
+    <div class="page-single">
+        <div class="container">
+            <div class="row">
+                <div class="col text-center mx-auto">
+                    <div class="h1">请选择你的性别</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6 col-sm-6">
+                    <label class="imagecheck mb-4 float-right">
+                        <input name="sex" type="radio" value="1" class="imagecheck-input"/>
+                        <figure class="imagecheck-figure"
+                                style="width: 250px; height:250px; text-align: center; line-height: 380px; color: pink;">
+                            <i class="fa fa-venus" style="font-size:200px;"></i>
+                        </figure>
+                    </label>
+                </div>
+                <div class="col-6 col-sm-6">
+                    <label class="imagecheck mb-4">
+                        <input name="sex" type="radio" value="2" class="imagecheck-input"/>
+                        <figure class="imagecheck-figure"
+                                style="width: 250px; height:250px; text-align: center; line-height: 380px; color: lightskyblue;">
+                            <i class="fa fa-mars" style="font-size:200px;"></i>
+                        </figure>
+                    </label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col text-center mx-auto">
+                    <div id="previous" class="btn btn-azure w-25">上一步</div>
+                    <div id="next" class="btn btn-azure w-25 next-2" style="display: none;">下一步</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="page-3" class="page" style="display: none;">
+    <div class="page-single">
+        <div class="container">
+            <div class="row">
+                <div class="col text-center mx-auto">
+                    <div class="h1">请输入你的信息</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col col-login mx-auto">
+                    <div class="card-body p-6">
+                        <div class="dimmer">
+                            <div class="dimmer-content">
+                                <div class="form-group">
+                                    <label class="form-label">姓名</label>
+                                    <input id="name" type="text" class="form-control" name="example-text-input"
+                                           placeholder="你的姓名">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">生日</label>
+                                    <input id="birthday" type="date" class="form-control" name="example-date-input"
+                                           placeholder="你的生日">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">手机号(+86)</label>
+                                    <input id="phone" type="tel" maxlength="11" class="form-control" name="example-date-input"
+                                           placeholder="你的手机号">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">故乡</label>
+                                    <div class="row gutters-xs">
+                                      <div class="col-4">
+                                          <select id="old_province" onblur="addressVal(1);" name="old_province" class="form-control custom-select"></select>
+                                      </div>
+                                      <div class="col-4">
+                                        <select id="old_city" onblur="addressVal(1);" name="old_city" class="form-control custom-select"></select>
+                                      </div>
+                                      <div class="col-4">
+                                        <select id="old_county" onblur="addressVal(1);" name="old_county" class="form-control custom-select"></select>
+                                      </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">现居地</label>
+                                    <div class="row gutters-xs">
+                                      <div class="col-4">
+                                          <select id="new_province" onblur="addressVal(2);" name="new_province" class="form-control custom-select"></select>
+                                      </div>
+                                      <div class="col-4">
+                                        <select id="new_city" onblur="addressVal(2);" name="new_city" class="form-control custom-select"></select>
+                                      </div>
+                                      <div class="col-4">
+                                        <select id="new_county" onblur="addressVal(2);" name="new_county" class="form-control custom-select"></select>
+                                      </div>
+                                    </div>
+                                  </div>
+                                <div class="form-group">
+                                    <label class="form-label">相识</label>
+                                    <textarea id="origin" rows="5" class="form-control" placeholder="如何相识的"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col text-center mx-auto">
+                    <div id="previous" class="btn btn-azure w-25">上一步</div>
+                    <div id="next" class="btn btn-azure w-25 next-3" style="display: none;">下一步</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="page-4" class="page" style="display: none;">
+    <div class="page-single">
+        <div class="container">
+<form id="main-form" method="POST" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col text-center mx-auto">
+                    <div class="h1">照片</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col mx-auto">
+                    <div class="card-body p-6">
+                        <div class="m-auto">
+                            <div class="row mx-auto">
+                                <div class="col-6 col-sm-6 col-lg-3">
+                                    <div class="item">
+                                        <svg class="icon addImg" aria-hidden="true">
+                                            <use xlink:href="#icon-tianjiatupian"></use>
+                                        </svg>
+                                        <input name="form_photo_value_1" type="file" class="upload_input"
+                                               onChange="preview(this);" hidden>
+                                        <div class="preview"></div>
+                                        <div class="click" onClick="loadImg(this)"></div>
+                                        <div class="delete" onClick="deleteImg(this)">
+                                            <svg class="icon" aria-hidden="true">
+                                                <use xlink:href="#icon-shanchu4"></use>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" id="description" style="display: none;">
+                                        <textarea rows="3" name="form_photo_description_1" class="form-control" placeholder="照片描述(可选)"
+                                                  onChange="$('#form-photo-description-1').val($(this).val());"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-sm-6 col-lg-3">
+                                    <div class="item">
+                                        <svg class="icon addImg" aria-hidden="true">
+                                            <use xlink:href="#icon-tianjiatupian"></use>
+                                        </svg>
+                                        <input name="form_photo_value_2" type="file" class="upload_input"
+                                               onChange="preview(this);" hidden>
+                                        <div class="preview"></div>
+                                        <div class="click" onClick="loadImg(this)"></div>
+                                        <div class="delete" onClick="deleteImg(this)">
+                                            <svg class="icon" aria-hidden="true">
+                                                <use xlink:href="#icon-shanchu4"></use>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" id="description" style="display: none;">
+                                        <textarea rows="3" name="form_photo_description_2" class="form-control" placeholder="照片描述(可选)"
+                                         onChange="$('#form-photo-description-2').val($(this).val());"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-sm-6 col-lg-3">
+                                    <div class="item">
+                                        <svg class="icon addImg" aria-hidden="true">
+                                            <use xlink:href="#icon-tianjiatupian"></use>
+                                        </svg>
+                                        <input name="form_photo_value_3" type="file" class="upload_input"
+                                               onChange="preview(this);" hidden>
+                                        <div class="preview"></div>
+                                        <div class="click" onClick="loadImg(this)"></div>
+                                        <div class="delete" onClick="deleteImg(this)">
+                                            <svg class="icon" aria-hidden="true">
+                                                <use xlink:href="#icon-shanchu4"></use>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" id="description" style="display: none;">
+                                        <textarea rows="3" name="form_photo_description_3" class="form-control" placeholder="照片描述(可选)"
+                                         onChange="$('#form-photo-description-3').val($(this).val());"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-sm-6 col-lg-3">
+                                    <div class="item">
+                                        <svg class="icon addImg" aria-hidden="true">
+                                            <use xlink:href="#icon-tianjiatupian"></use>
+                                        </svg>
+                                        <input name="form_photo_value_4" type="file" class="upload_input"
+                                               onChange="preview(this);" hidden>
+                                        <div class="preview"></div>
+                                        <div class="click" onClick="loadImg(this)"></div>
+                                        <div class="delete" onClick="deleteImg(this)">
+                                            <svg class="icon" aria-hidden="true">
+                                                <use xlink:href="#icon-shanchu4"></use>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" id="description" style="display: none;">
+                                        <textarea rows="3" name="form_photo_description_4" class="form-control" placeholder="照片描述(可选)"
+                                         onChange="$('#form-photo-description-4').val($(this).val());"></textarea>
+                                    </div>
+                                </div>
+                                <div hidden>
+                                    <input id="form-name-value" name="form_name_value" type="hidden">
+                                    <input id="form-sex-value" name="form_sex_value" type="hidden">
+                                    <input id="form-birthday-value" name="form_birthday_value" type="hidden">
+                                    <input id="form-phone-value" name="form_phone_value" type="hidden">
+                                    <input id="form-old-address-value" name="form_old_address_value" type="hidden">
+                                    <input id="form-new-address-value" name="form_new_address_value" type="hidden">
+                                    <textarea id="form-origin-value" name="form_origin_value" hidden></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col text-center mx-auto">
+                    <div id="previous" class="btn btn-azure w-25">上一步</div>
+                    <div id="next" class="btn btn-azure w-25">下一步</div>
+                </div>
+            </div>
+</form>
+        </div>
+    </div>
+</div>
+<div id="page-5" class="page" style="display: none;">
+    <div class="page-single">
+        <div class="container">
+            <div class="row">
+                <div class="col text-center mx-auto">
+                    <div class="h1">请你确认</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col col-login mx-auto">
+                    <fieldset class="form-fieldset">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label class="form-label">姓名</label>
+                            <input id="form-name-text" type="text" class="form-control" placeholder="姓名" value="" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">性别</label>
+                            <input id="form-sex-text" type="text" class="form-control" value="" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">生日</label>
+                            <input id="form-birthday-text" type="text" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">手机号</label>
+                            <input id="form-phone-text" type="text" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">故乡</label>
+                            <input id="form-old-address-text" type="text" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">现居地</label>
+                            <input id="form-new-address-text" type="text" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">相识</label>
+                            <textarea id="form-origin-text" class="form-control" rows="5" disabled></textarea>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="row">
+                <div class="alert alert-info mx-auto">
+                    确认提交后您填写的信息将无法修改
+                </div>
+            </div>
+            <div class="row">
+                <div class="col text-center mx-auto">
+                    <div id="previous" class="btn btn-azure w-25">上一步</div>
+                    <div id="submit-main" class="btn btn-azure w-25">确认提交</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static '/assets/js/require.min.js' %}"></script>
+<script>
+    requirejs.config({
+        baseUrl: '/static'
+    });
+</script>
+<script src="{% static '/js/svg.js' %}"></script>
+<script src="{% static '/assets/js/dashboard.js' %}"></script>
+<script src="{% static '/assets/plugins/input-mask/plugin.js' %}"></script>
+<script src="{% static '/js/area.js' %}"></script>
+<script type="text/javascript">_init_area()</script>
+<script>
+    var page = 1;
+    var page_min = 1;
+    var page_max = 5;
+    requirejs(['jquery'], function ($) {
+        $(document).on('click', '#previous', function () {
+            $('#page-' + page).hide();
+            page - 1 < page_min ? page : page -= 1;
+            $('#page-' + page).show();
+        });
+        $(document).on('click', '#next', function () {
+            $('#page-' + page).hide();
+            page + 1 > page_max ? page : page += 1;
+            $('#page-' + page).show();
+        });
+        $(document).on('click', "input[name='sex']:checked", function () {
+            $('.next-' + page).show();
+        });
+    });
+</script>
+<script>
+
+   //选择图片
+   var loadImg = function(obj){
+       var v = $(obj).parent().find(".upload_input").val();
+       if(v != "") return;
+       $(obj).parent().find(".upload_input").click();
+   }
+   //删除
+   var deleteImg = function(obj){
+       $(obj).parent().find('input').val('');
+       $(obj).parent().find('.preview').html('');
+       $(obj).hide();
+       $(obj).parent().parent().find('#description').children('textarea').val('');
+       $(obj).parent().parent().find('#description').hide();
+   }
+   function preview(file) {
+     var prevDiv = $(file).parent().find('.preview');
+     if (file.files && file.files[0]) {
+       var reader = new FileReader();
+       reader.onload = function(evt) {
+         prevDiv.html('<img src="' + evt.target.result + '" />');
+       }
+       reader.readAsDataURL(file.files[0]);
+     } else {//IE
+         prevDiv.html('<div class="img" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale,src=\'' + file.value + '\'"></div>');
+     }
+     $(file).parent().find('.delete').show();
+     $(file).parent().parent().find('#description').show();
+   }
+</script>
+<script>
+    function addressVal(i){
+            i -= 1;
+            var ls = ['old', 'new']
+            var province = $('#'+ls[i]+'_province').val();
+            var city = $('#'+ls[i]+'_city').val();
+            var county = $('#'+ls[i]+'_county').val();
+            $('#form-'+ls[i]+'-address-value').val(province + '-' + city + '-' + county);
+            $('#form-'+ls[i]+'-address-text').val(province + '-' + city + '-' + county);
+        }
+    requirejs(['jquery'], function($){
+        $(document).on('change', 'input:radio[name="sex"]', function(){
+            var sex= $('input:radio[name="sex"]:checked').val();
+            if(sex == 1){
+                $('#form-sex-value').val(1);
+                $('#form-sex-text').val('女');
+            }else if(sex == 2){
+                $('#form-sex-value').val(2);
+                $('#form-sex-text').val('男');
+            }else{
+                alert('出错, 请刷新');
+            }
+        });
+        $(document).on('change', '#name', function(){
+            if($('#name').val()!=''){
+                $('.next-' + page).show();
+            }else{
+                $('.next-' + page).hide();
+            }
+            var name = $('#name').val();
+            $('#form-name-value').val(name);
+            $('#form-name-text').val(name);
+        });
+        $(document).on('change', '#birthday', function(){
+            var birthday = $('#birthday').val();
+            $('#form-birthday-value').val(birthday);
+            $('#form-birthday-text').val(birthday);
+        });
+        $(document).on('change', '#phone', function(){
+            var phone = $('#phone').val();
+            $('#form-phone-value').val(phone);
+            $('#form-phone-text').val(phone);
+        });
+        $(document).on('change', '#origin', function(){
+            var origin = $('#origin').val();
+            $('#form-origin-value').val(origin);
+            $('#form-origin-text').val(origin);
+        });
+
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $(document).on('click', '#submit-main', function(){
+            //$('#main-form').submit();
+            var form = new FormData(document.getElementById('main-form'));
+            $.ajax({
+                url: '{% url 'remember:shareSave' link %}',
+                type: 'POST',
+                beforeSend:function(jqXHR, settings){
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        jqXHR.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                },
+                data: form,
+                processData:false,
+                contentType:false,
+                success: function(data){
+                    if(data.code == 108) {
+                        if (data.form_name_value != undefined) {
+                            alert(data.form_name_value[0].message);
+                        }
+                        if (data.form_birthday_value != undefined) {
+                            alert(data.form_birthday_value[0].message);
+                        }
+                        if (data.form_phone_value != undefined) {
+                            alert(data.form_phone_value[0].message);
+                        }
+                        if (data.form_old_address_value != undefined) {
+                            alert(data.form_old_address_value[0].message);
+                        }
+                        if (data.form_new_address_value != undefined) {
+                            alert(data.form_new_address_value[0].message);
+                        }
+                    }else if(data.code == 109){
+                        window.location.href = "{% url 'common:shareSuccess' %}";
+                    }else if(data.code == 111){
+                        alert('用户信息出现异常, 请刷新');
+                    }else{
+                        alert('出现异常, 请联系管理员');
+                    }
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

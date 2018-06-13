@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>登录 - Remember</title>
+    <link rel="icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static '/image/favicon.ico' %}" type="image/x-icon">
+    <link href="{% static '/assets/css/dashboard.css' %}" rel="stylesheet" />
+</head>
+<body class="">
+    <div class="page">
+      <div class="page-single">
+        <div class="container">
+          <div class="row">
+            <div class="col col-login mx-auto">
+              <form id="login" class="card" action="{% url 'common:login' %}" method="post">
+                  {% csrf_token %}
+                <div class="card-body p-6">
+                  <div class="card-title">请登录你的账号</div>
+                  <div id="loader-main" class="dimmer">
+                    <div class="loader"></div>
+                    <div class="dimmer-content">
+                      <div id="error-message" class="card-alert alert alert-danger mb-0" style="display: none;"></div>
+                      <div class="form-group">
+                        <label class="form-label">{{ form.username.label_tag }}</label>
+                        <input type="text" name="username" class="form-control" id="exampleInputUsername1" placeholder="请输入账号" value="" required>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">
+                          {{ form.password.label_tag }}
+                          <a href="javascript:alert('联系管理员, QQ:1220202232');" class="float-right small">忘记密码?</a>
+                        </label>
+                        <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="请输入密码" value="" required>
+                      </div>
+                      <div class="form-footer">
+                        <button type="submit" class="btn btn-primary btn-block">登录</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+              <div class="text-center text-muted">
+                还没有账号? <a href="{% url 'common:register' %}">去注册</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="{% static '/assets/js/require.min.js' %}"></script>
+    <script>
+         requirejs.config({
+             baseUrl: '/static'
+         });
+    </script>
+    <script src="{% static '/assets/js/dashboard.js' %}"></script>
+    <script>
+        require(['jquery'], function($){
+            $(document).ready(function(){
+                var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+                function csrfSafeMethod(method) {
+                    // these HTTP methods do not require CSRF protection
+                    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+                }
+                $.ajaxSetup({
+                    beforeSend: function(xhr, settings) {
+                        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                        }
+                    }
+                });
+                $(document).on('submit', '#login', function(e){
+                    e.preventDefault();
+                    $('#error-message').css('display', 'none');
+                    $('#loader-main').addClass('active');
+                    var username = $('#exampleInputUsername1').val();
+                    var password = $("#exampleInputPassword1").val();
+                    $.ajax({
+                        url: "{% url 'common:login' %}",
+                        method: 'POST',
+                        headers: {
+                            "Authorization": "Basic" + btoa(username + ":" + password)
+                        },
+                        success: function(data, textStatus, jqXHR){
+                            if(data.code == 101){
+                                window.location.href = "/";
+                            }else if(data.code == 102){
+                                $('#error-message').html('用户名或密码不正确');
+                                $("#error-message").css('display', 'block');
+                            }else if(data.code == 103){
+                                $('#error-message').html('用户名和密码不能为空');
+                                $("#error-message").css('display', 'block');
+                            }else if(data.code == 999){
+                                alert('系统出现未知错误，请联系管理员');
+                            }else{
+                                alert('系统出现不可预错误，请联系管理员');
+                            }
+                        },
+                        timeout: 3000,
+                        error: function(jqXHR, textStatus, errorThrown){
+                            if(textStatus === 'timeout'){
+                                alert('请求超时');
+                            }else{
+                                alert('出现错误');
+                            }
+                        },
+                        complete: function(jqXHR, textStatus){
+                            $('#loader-main').removeClass('active');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+  </body>
+</html>
